@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-calendar-server
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      # Mount the application code for development (comment out for production)
+      - .:/app
+      - /app/node_modules
+    networks:
+      - mcp-network
+    # For development, you might want to expose a port
+    # ports:
+    #   - "3000:3000"
+    stdin_open: true
+    tty: true
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a database service if needed in the future
+  # database:
+  #   image: postgres:15-alpine
+  #   container_name: mcp-database
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: mcp_db
+  #     POSTGRES_USER: mcp_user
+  #     POSTGRES_PASSWORD: mcp_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - mcp-network
+  #   ports:
+  #     - "5432:5432"
+
+networks:
+  mcp-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:
